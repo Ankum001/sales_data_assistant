@@ -1,193 +1,111 @@
 from __future__ import annotations
 
-import typing as _t
-
-from narwhals import dependencies, dtypes, exceptions, selectors
-from narwhals._utils import (
-    Implementation,
-    generate_temporary_column_name,
-    is_ordered_categorical,
-    maybe_align_index,
-    maybe_convert_dtypes,
-    maybe_get_index,
-    maybe_reset_index,
-    maybe_set_index,
+from ._core._contextmanagers import AsyncContextManagerMixin as AsyncContextManagerMixin
+from ._core._contextmanagers import ContextManagerMixin as ContextManagerMixin
+from ._core._eventloop import current_time as current_time
+from ._core._eventloop import get_all_backends as get_all_backends
+from ._core._eventloop import get_available_backends as get_available_backends
+from ._core._eventloop import get_cancelled_exc_class as get_cancelled_exc_class
+from ._core._eventloop import run as run
+from ._core._eventloop import sleep as sleep
+from ._core._eventloop import sleep_forever as sleep_forever
+from ._core._eventloop import sleep_until as sleep_until
+from ._core._exceptions import BrokenResourceError as BrokenResourceError
+from ._core._exceptions import BrokenWorkerInterpreter as BrokenWorkerInterpreter
+from ._core._exceptions import BrokenWorkerProcess as BrokenWorkerProcess
+from ._core._exceptions import BusyResourceError as BusyResourceError
+from ._core._exceptions import ClosedResourceError as ClosedResourceError
+from ._core._exceptions import ConnectionFailed as ConnectionFailed
+from ._core._exceptions import DelimiterNotFound as DelimiterNotFound
+from ._core._exceptions import EndOfStream as EndOfStream
+from ._core._exceptions import IncompleteRead as IncompleteRead
+from ._core._exceptions import NoEventLoopError as NoEventLoopError
+from ._core._exceptions import RunFinishedError as RunFinishedError
+from ._core._exceptions import TypedAttributeLookupError as TypedAttributeLookupError
+from ._core._exceptions import WouldBlock as WouldBlock
+from ._core._fileio import AsyncFile as AsyncFile
+from ._core._fileio import Path as Path
+from ._core._fileio import open_file as open_file
+from ._core._fileio import wrap_file as wrap_file
+from ._core._resources import aclose_forcefully as aclose_forcefully
+from ._core._signals import open_signal_receiver as open_signal_receiver
+from ._core._sockets import TCPConnectable as TCPConnectable
+from ._core._sockets import UNIXConnectable as UNIXConnectable
+from ._core._sockets import as_connectable as as_connectable
+from ._core._sockets import connect_tcp as connect_tcp
+from ._core._sockets import connect_unix as connect_unix
+from ._core._sockets import create_connected_udp_socket as create_connected_udp_socket
+from ._core._sockets import (
+    create_connected_unix_datagram_socket as create_connected_unix_datagram_socket,
 )
-from narwhals.dataframe import DataFrame, LazyFrame
-from narwhals.dtypes import (
-    Array,
-    Binary,
-    Boolean,
-    Categorical,
-    Date,
-    Datetime,
-    Decimal,
-    Duration,
-    Enum,
-    Field,
-    Float32,
-    Float64,
-    Int8,
-    Int16,
-    Int32,
-    Int64,
-    Int128,
-    List,
-    Object,
-    String,
-    Struct,
-    Time,
-    UInt8,
-    UInt16,
-    UInt32,
-    UInt64,
-    UInt128,
-    Unknown,
+from ._core._sockets import create_tcp_listener as create_tcp_listener
+from ._core._sockets import create_udp_socket as create_udp_socket
+from ._core._sockets import create_unix_datagram_socket as create_unix_datagram_socket
+from ._core._sockets import create_unix_listener as create_unix_listener
+from ._core._sockets import getaddrinfo as getaddrinfo
+from ._core._sockets import getnameinfo as getnameinfo
+from ._core._sockets import notify_closing as notify_closing
+from ._core._sockets import wait_readable as wait_readable
+from ._core._sockets import wait_socket_readable as wait_socket_readable
+from ._core._sockets import wait_socket_writable as wait_socket_writable
+from ._core._sockets import wait_writable as wait_writable
+from ._core._streams import create_memory_object_stream as create_memory_object_stream
+from ._core._subprocesses import open_process as open_process
+from ._core._subprocesses import run_process as run_process
+from ._core._synchronization import CapacityLimiter as CapacityLimiter
+from ._core._synchronization import (
+    CapacityLimiterStatistics as CapacityLimiterStatistics,
 )
-from narwhals.expr import Expr
-from narwhals.functions import (
-    all_ as all,
-    all_horizontal,
-    any_horizontal,
-    coalesce,
-    col,
-    concat,
-    concat_str,
-    exclude,
-    format,
-    from_arrow,
-    from_dict,
-    from_dicts,
-    from_numpy,
-    len_ as len,
-    lit,
-    max,
-    max_horizontal,
-    mean,
-    mean_horizontal,
-    median,
-    min,
-    min_horizontal,
-    new_series,
-    nth,
-    read_csv,
-    read_parquet,
-    scan_csv,
-    scan_parquet,
-    show_versions,
-    sum,
-    sum_horizontal,
-    when,
-)
-from narwhals.schema import Schema
-from narwhals.series import Series
-from narwhals.translate import (
-    from_native,
-    get_native_namespace,
-    narwhalify,
-    to_native,
-    to_py_scalar,
-)
+from ._core._synchronization import Condition as Condition
+from ._core._synchronization import ConditionStatistics as ConditionStatistics
+from ._core._synchronization import Event as Event
+from ._core._synchronization import EventStatistics as EventStatistics
+from ._core._synchronization import Lock as Lock
+from ._core._synchronization import LockStatistics as LockStatistics
+from ._core._synchronization import ResourceGuard as ResourceGuard
+from ._core._synchronization import Semaphore as Semaphore
+from ._core._synchronization import SemaphoreStatistics as SemaphoreStatistics
+from ._core._tasks import TASK_STATUS_IGNORED as TASK_STATUS_IGNORED
+from ._core._tasks import CancelScope as CancelScope
+from ._core._tasks import create_task_group as create_task_group
+from ._core._tasks import current_effective_deadline as current_effective_deadline
+from ._core._tasks import fail_after as fail_after
+from ._core._tasks import move_on_after as move_on_after
+from ._core._tempfile import NamedTemporaryFile as NamedTemporaryFile
+from ._core._tempfile import SpooledTemporaryFile as SpooledTemporaryFile
+from ._core._tempfile import TemporaryDirectory as TemporaryDirectory
+from ._core._tempfile import TemporaryFile as TemporaryFile
+from ._core._tempfile import gettempdir as gettempdir
+from ._core._tempfile import gettempdirb as gettempdirb
+from ._core._tempfile import mkdtemp as mkdtemp
+from ._core._tempfile import mkstemp as mkstemp
+from ._core._testing import TaskInfo as TaskInfo
+from ._core._testing import get_current_task as get_current_task
+from ._core._testing import get_running_tasks as get_running_tasks
+from ._core._testing import wait_all_tasks_blocked as wait_all_tasks_blocked
+from ._core._typedattr import TypedAttributeProvider as TypedAttributeProvider
+from ._core._typedattr import TypedAttributeSet as TypedAttributeSet
+from ._core._typedattr import typed_attribute as typed_attribute
 
-__version__: str
-
-__all__ = [
-    "Array",
-    "Binary",
-    "Boolean",
-    "Categorical",
-    "DataFrame",
-    "Date",
-    "Datetime",
-    "Decimal",
-    "Duration",
-    "Enum",
-    "Expr",
-    "Field",
-    "Float32",
-    "Float64",
-    "Implementation",
-    "Int8",
-    "Int16",
-    "Int32",
-    "Int64",
-    "Int128",
-    "LazyFrame",
-    "List",
-    "Object",
-    "Schema",
-    "Series",
-    "String",
-    "Struct",
-    "Time",
-    "UInt8",
-    "UInt16",
-    "UInt32",
-    "UInt64",
-    "UInt128",
-    "Unknown",
-    "all",
-    "all_horizontal",
-    "any_horizontal",
-    "coalesce",
-    "col",
-    "concat",
-    "concat_str",
-    "dependencies",
-    "dtypes",
-    "exceptions",
-    "exclude",
-    "format",
-    "from_arrow",
-    "from_dict",
-    "from_dicts",
-    "from_native",
-    "from_numpy",
-    "generate_temporary_column_name",
-    "get_native_namespace",
-    "is_ordered_categorical",
-    "len",
-    "lit",
-    "max",
-    "max_horizontal",
-    "maybe_align_index",
-    "maybe_convert_dtypes",
-    "maybe_get_index",
-    "maybe_reset_index",
-    "maybe_set_index",
-    "mean",
-    "mean_horizontal",
-    "median",
-    "min",
-    "min_horizontal",
-    "narwhalify",
-    "new_series",
-    "nth",
-    "read_csv",
-    "read_parquet",
-    "scan_csv",
-    "scan_parquet",
-    "selectors",
-    "show_versions",
-    "sum",
-    "sum_horizontal",
-    "to_native",
-    "to_py_scalar",
-    "when",
-]
+# Re-export imports so they look like they live directly in this package
+for __value in list(locals().values()):
+    if getattr(__value, "__module__", "").startswith("anyio."):
+        __value.__module__ = __name__
 
 
-if not _t.TYPE_CHECKING:
+del __value
 
-    def __getattr__(name: str) -> _t.Any:
-        if name == "__version__":
-            global __version__  # noqa: PLW0603
 
-            from importlib import metadata
+def __getattr__(attr: str) -> type[BrokenWorkerInterpreter]:
+    """Support deprecated aliases."""
+    if attr == "BrokenWorkerIntepreter":
+        import warnings
 
-            __version__ = metadata.version(__name__)
-            return __version__
-        msg = f"module {__name__!r} has no attribute {name!r}"
-        raise AttributeError(msg)
-else:  # pragma: no cover
-    ...
+        warnings.warn(
+            "The 'BrokenWorkerIntepreter' alias is deprecated, use 'BrokenWorkerInterpreter' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return BrokenWorkerInterpreter
+
+    raise AttributeError(f"module {__name__!r} has no attribute {attr!r}")
